@@ -1,0 +1,2 @@
+- **Be aware and check out the pricings before usage**
+- **Delete all resources when you are done learning or you don't need them any more**
