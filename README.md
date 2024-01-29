@@ -1,1 +1,1 @@
-# devopsbootcamp exercises
+# devops bootcamp exercises
