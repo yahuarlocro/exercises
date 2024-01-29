@@ -13,7 +13,7 @@ It prints relevant informative messages for all 3 conditions. Installation was s
 
 - See file 02-install-java.sh
 
-```
+```bash
 set -e 
 
 sudo apt update

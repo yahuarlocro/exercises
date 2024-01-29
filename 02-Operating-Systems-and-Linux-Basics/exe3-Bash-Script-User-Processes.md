@@ -7,7 +7,7 @@ Write a bash script using Vim editor that checks all the processes running for t
 
 see file 03-user-processes.sh
 
-```
+```bash
 set -e 
 
 ps aux | grep ${USER}
