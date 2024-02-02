@@ -1,9 +1,19 @@
-# Task
-Extend the script to check after running the application that the application has successfully started and prints out the application's running process and the port where it's listening.
+#!/bin/bash
+#title           :07-node-app-check-status.sh
+#description     :This script installs nodejs, and npm. Also downloads an 
+#                :application. Then it sets up the needed environment, installs
+#                :needed packages, and runs the application.
+#                ;Checks app sucessful start and shows app running process
+#                :Asks for a log directory, checks if exits. If not, directory
+#                :will be created and env_var will be set
+#author          :yahuarlocro
+#date            :30-01-2024
+#version         :0.1
+#usage           :bash 07-node-app-check-status.sh
+#                :./07-node-app-check-status.sh
+#dependecies     :
+#==============================================================================
 
-# Solution
-
-```bash
 set -e
 
 sudo apt update
@@ -25,6 +35,23 @@ sudo apt install -y npm
 wget https://node-envvars-artifact.s3.eu-west-2.amazonaws.com/bootcamp-node-envvars-project-1.0.0.tgz
 
 tar zxvf bootcamp-node-envvars-project-1.0.0.tgz
+
+read -p "Enter absolute path for storing logs: " LOG_DIR
+
+if [[ -d $LOG_DIR ]]; then
+    echo ${LOG_DIR}
+    echo "directory exists"
+    export LOG_DIR=${LOG_DIR}
+    echo "environment variable was set"
+elif [[ ! -d $LOG_DIR ]]; then
+    echo "directory does not exist"
+    echo "creating directory"
+    mkdir ${LOG_DIR}
+    echo "directory was created"
+    export LOG_DIR=${LOG_DIR}
+    echo "environment variable was set"
+
+fi
 
 export APP_ENV=dev
 export DB_USER=myuser
@@ -61,4 +88,6 @@ if [[ -n ${PORT} ]]; then
 
 fi
 
-```
+
+
+
