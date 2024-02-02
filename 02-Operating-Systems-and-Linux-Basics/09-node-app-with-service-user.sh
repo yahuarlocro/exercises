@@ -1,16 +1,20 @@
-# Task
-Extend the script to accept a parameter input log_directory: a directory where application will write logs.
+#!/bin/bash
+#title           :09-node-app-with-service-user.sh
+#description     :This script installs nodejs, and npm. Also downloads an 
+#                :application. Then it sets up the needed environment, installs
+#                :needed packages, and runs the application.
+#                ;Checks app sucessful start and shows app running process
+#                :Asks for a log directory, checks if exits. If not, directory
+#                :will be created and env_var will be set
+#                :run the node app as a different user
+#author          :yahuarlocro
+#date            :02-02-2024
+#version         :0.1
+#usage           :bash 09-node-app-with-service-user.sh
+#                :./09-node-app-with-service-user.sh
+#dependecies     :
+#==============================================================================
 
-The script will check whether the parameter value is a directory name that doesn't exist and will create the directory, if it does exist, it sets the env var LOG_DIR to the directory's absolute path before running the application, so the application can read the LOG_DIR environment variable and write its logs there.
-
-Note:
-
-- Check the app.log file in the provided LOG_DIR directory.
-
-
-# Solution
-
-```bash
 set -e
 
 sudo apt update
@@ -60,7 +64,12 @@ npm install
 
 npm audit fix --force
 
-node server.js &
+read -p "Enter what is the sudo password: " SUDO_PASS
+
+echo "${SUDO_PASS}" | sudo -S  useradd -c 'service user node js' -l -M -N -s /usr/sbin/nologin myapp
+
+
+echo "${SUDO_PASS}" | sudo -S -u myapp node server.js &
 
 sleep 3
 
@@ -84,4 +93,7 @@ if [[ -n ${PORT} ]]; then
     echo "################################################"
 
 fi
-```
+
+
+
+
