@@ -15,7 +15,7 @@
 #dependecies     :
 #==============================================================================
 
-set -e
+set -ev
 
 sudo apt update
 
@@ -33,52 +33,77 @@ echo "################################################"
 
 sudo apt install -y npm
 
-wget https://node-envvars-artifact.s3.eu-west-2.amazonaws.com/bootcamp-node-envvars-project-1.0.0.tgz
+# wget https://node-envvars-artifact.s3.eu-west-2.amazonaws.com/bootcamp-node-envvars-project-1.0.0.tgz
 
-tar zxvf bootcamp-node-envvars-project-1.0.0.tgz
+# tar zxvf bootcamp-node-envvars-project-1.0.0.tgz
+
+
+# export APP_ENV=dev
+# export DB_USER=myuser
+# export DB_PWD=mysecret
+
+# cd package
+
+# npm install
+
+# npm audit fix --force
+
+read -p "Enter what is the sudo password: " SUDO_PASS
+
+echo "${SUDO_PASS}" | sudo -S  useradd -c 'service user node js' -l -m -N -s /bin/bash myapp
+# fetch NodeJS project archive from s3 bucket
+echo "${SUDO_PASS}" | sudo -S runuser -l myapp -c "wget https://node-envvars-artifact.s3.eu-west-2.amazonaws.com/bootcamp-node-envvars-project-1.0.0.tgz"
+
+# extract the project archive to ./package folder
+echo "${SUDO_PASS}" | sudo -S runuser -l myapp -c "tar zxvf ./bootcamp-node-envvars-project-1.0.0.tgz"
 
 read -p "Enter absolute path for storing logs: " LOG_DIR
 
 if [[ -d $LOG_DIR ]]; then
     echo ${LOG_DIR}
     echo "directory exists"
-    export LOG_DIR=${LOG_DIR}
-    echo "environment variable was set"
+    # export LOG_DIR=${LOG_DIR}
+    # echo "environment variable was set"
 elif [[ ! -d $LOG_DIR ]]; then
     echo "directory does not exist"
     echo "creating directory"
-    mkdir ${LOG_DIR}
+    echo "${SUDO_PASS}" | sudo -S mkdir ${LOG_DIR}
     echo "directory was created"
-    export LOG_DIR=${LOG_DIR}
-    echo "environment variable was set"
+    # export LOG_DIR=${LOG_DIR}
+    # echo "environment variable was set"
 
 fi
 
-export APP_ENV=dev
-export DB_USER=myuser
-export DB_PWD=mysecret
-
-cd package
-
-npm install
-
-npm audit fix --force
-
-read -p "Enter what is the sudo password: " SUDO_PASS
-
-echo "${SUDO_PASS}" | sudo -S  useradd -c 'service user node js' -l -M -N -s /usr/sbin/nologin myapp
+# GROUP=$(echo ${USER} | id $1 | awk -F' ' '{print $2}' | awk -F'(' '{print $2}' | awk -F')' '{print $1}')
+# echo ${GROUP}
+# echo "${SUDO_PASS}" | sudo usermod -aG ${GROUP} myapp
+# echo "${SUDO_PASS}" | sudo -S -u myapp npm install
 
 
-echo "${SUDO_PASS}" | sudo -S -u myapp node server.js &
+echo "${SUDO_PASS}" | sudo -S runuser -l myapp -c "
+    export APP_ENV=dev && 
+    export DB_PWD=mysecret && 
+    export DB_USER=myuser && 
+    export LOG_DIR=${LOG_DIR} && 
+    cd package &&
+    npm install &&
+    npm audit fix --force &&
+    node server.js &"
 
-sleep 3
+# echo "${SUDO_PASS}" | echo "APP_ENV=dev" | sudo tee -a /home/myapp/.profile
+# echo "${SUDO_PASS}" | echo "DB_USER=myuser" | sudo tee -a /home/myapp/.profile
+# echo "${SUDO_PASS}" | echo "DB_PWD=mysecret" | sudo tee -a /home/myapp/.profile 
+# echo "${SUDO_PASS}" | echo "LOG_DIR=${LOG_DIR}" | sudo tee -a /home/myapp/.profile
+
+# echo "sleeping"
+# sleep 4
 
 PSID=$(pidof node)
 
 echo "${PSID}"
-
-PORT=$(ss -tulpn | grep "${PSID}" | awk -F' ' '{printf $5}')
-# PORT=$(ss -tulpn | awk -v psid="${PSID}"  '$0 ~ psid {print $5}')
+ss -tulpn
+# PORT=$(ss -tulpn | grep "${PSID}" | awk -F' ' '{printf $5}')
+PORT=$(ss -tulpn | awk -v psid="${PSID}"  '$0 ~ psid {print $5}')
 echo "${PORT}"
 
 
